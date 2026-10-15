@@ -6,7 +6,20 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3ED9B38596E2FA42EBA773D6 /* ContentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6FE88B13E394DB8D5849C7 /* ContentProvider.swift */; };
+		A7D5510835883C1C508786BF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52AD88D3E8FED7F951AE961 /* Foundation.framework */; };
+		F92FF214C2B56345BF7D5A6A /* Clock Face TopShelf.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F3992ADD5D35A4116BE519F /* Clock Face TopShelf.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		89F9B79C2267A8AE93DEDFD1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9C8FFEE13074F99600D9FD9D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 994ADCD1D81D722F40BB5331;
+			remoteInfo = "Clock Face TopShelf";
+		};
 		9C8FFEFB3074F99700D9FD9D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9C8FFEE13074F99600D9FD9D /* Project object */;
@@ -23,10 +36,29 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		2F7D7F2D32DC9DB7D33EB484 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F92FF214C2B56345BF7D5A6A /* Clock Face TopShelf.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		1F3992ADD5D35A4116BE519F /* Clock Face TopShelf.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Clock Face TopShelf.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		27EC7510C728937A6E581656 /* Clock_Face_TopShelf.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Clock_Face_TopShelf.entitlements; sourceTree = "<group>"; };
+		52DF5AED5EDE019F1C571B13 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8F6FE88B13E394DB8D5849C7 /* ContentProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContentProvider.swift; sourceTree = "<group>"; };
 		9C8FFEE93074F99600D9FD9D /* Clock Face.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clock Face.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C8FFEFA3074F99700D9FD9D /* Clock FaceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Clock FaceTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C8FFF043074F99700D9FD9D /* Clock FaceUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Clock FaceUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D52AD88D3E8FED7F951AE961 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -61,6 +93,14 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		625EFE16F431B309497D6738 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7D5510835883C1C508786BF /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9C8FFEE63074F99600D9FD9D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -85,6 +125,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		176E2C24100A7C846B4A18F7 /* tvOS */ = {
+			isa = PBXGroup;
+			children = (
+				D52AD88D3E8FED7F951AE961 /* Foundation.framework */,
+			);
+			name = tvOS;
+			sourceTree = "<group>";
+		};
+		2EEB237ED95B9AC0D8A8182A /* Clock Face TopShelf */ = {
+			isa = PBXGroup;
+			children = (
+				8F6FE88B13E394DB8D5849C7 /* ContentProvider.swift */,
+				52DF5AED5EDE019F1C571B13 /* Info.plist */,
+				27EC7510C728937A6E581656 /* Clock_Face_TopShelf.entitlements */,
+			);
+			path = "Clock Face TopShelf";
+			sourceTree = "<group>";
+		};
 		9C8FFEE03074F99600D9FD9D = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +150,8 @@
 				9C8FFEFD3074F99700D9FD9D /* Clock FaceTests */,
 				9C8FFF073074F99700D9FD9D /* Clock FaceUITests */,
 				9C8FFEEA3074F99600D9FD9D /* Products */,
+				E9E38C302BA3F9206822791D /* Frameworks */,
+				2EEB237ED95B9AC0D8A8182A /* Clock Face TopShelf */,
 			);
 			sourceTree = "<group>";
 		};
@@ -101,13 +161,39 @@
 				9C8FFEE93074F99600D9FD9D /* Clock Face.app */,
 				9C8FFEFA3074F99700D9FD9D /* Clock FaceTests.xctest */,
 				9C8FFF043074F99700D9FD9D /* Clock FaceUITests.xctest */,
+				1F3992ADD5D35A4116BE519F /* Clock Face TopShelf.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E9E38C302BA3F9206822791D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				176E2C24100A7C846B4A18F7 /* tvOS */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		994ADCD1D81D722F40BB5331 /* Clock Face TopShelf */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5FCECE2AA2E8262AFE52D109 /* Build configuration list for PBXNativeTarget "Clock Face TopShelf" */;
+			buildPhases = (
+				A464F6CCE6A2463CBED5764D /* Sources */,
+				625EFE16F431B309497D6738 /* Frameworks */,
+				4B28ACB60444F5986BD7E722 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Clock Face TopShelf";
+			productName = "Clock Face TopShelf";
+			productReference = 1F3992ADD5D35A4116BE519F /* Clock Face TopShelf.appex */;
+			productType = "com.apple.product-type.tv-app-extension";
+		};
 		9C8FFEE83074F99600D9FD9D /* Clock Face */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9C8FFF0D3074F99700D9FD9D /* Build configuration list for PBXNativeTarget "Clock Face" */;
@@ -115,17 +201,17 @@
 				9C8FFEE53074F99600D9FD9D /* Sources */,
 				9C8FFEE63074F99600D9FD9D /* Frameworks */,
 				9C8FFEE73074F99600D9FD9D /* Resources */,
+				2F7D7F2D32DC9DB7D33EB484 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				55032EE4290F5E6F322BFCB3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				9C8FFEEB3074F99600D9FD9D /* Clock Face */,
 			);
 			name = "Clock Face";
-			packageProductDependencies = (
-			);
 			productName = "Clock Face";
 			productReference = 9C8FFEE93074F99600D9FD9D /* Clock Face.app */;
 			productType = "com.apple.product-type.application";
@@ -147,8 +233,6 @@
 				9C8FFEFD3074F99700D9FD9D /* Clock FaceTests */,
 			);
 			name = "Clock FaceTests";
-			packageProductDependencies = (
-			);
 			productName = "Clock FaceTests";
 			productReference = 9C8FFEFA3074F99700D9FD9D /* Clock FaceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -170,8 +254,6 @@
 				9C8FFF073074F99700D9FD9D /* Clock FaceUITests */,
 			);
 			name = "Clock FaceUITests";
-			packageProductDependencies = (
-			);
 			productName = "Clock FaceUITests";
 			productReference = 9C8FFF043074F99700D9FD9D /* Clock FaceUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -216,11 +298,19 @@
 				9C8FFEE83074F99600D9FD9D /* Clock Face */,
 				9C8FFEF93074F99700D9FD9D /* Clock FaceTests */,
 				9C8FFF033074F99700D9FD9D /* Clock FaceUITests */,
+				994ADCD1D81D722F40BB5331 /* Clock Face TopShelf */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		4B28ACB60444F5986BD7E722 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9C8FFEE73074F99600D9FD9D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -266,9 +356,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A464F6CCE6A2463CBED5764D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3ED9B38596E2FA42EBA773D6 /* ContentProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		55032EE4290F5E6F322BFCB3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Clock Face TopShelf";
+			target = 994ADCD1D81D722F40BB5331 /* Clock Face TopShelf */;
+			targetProxy = 89F9B79C2267A8AE93DEDFD1 /* PBXContainerItemProxy */;
+		};
 		9C8FFEFC3074F99700D9FD9D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9C8FFEE83074F99600D9FD9D /* Clock Face */;
@@ -282,11 +386,38 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		7D565961CE5F89F2289A80D1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Clock Face TopShelf/Clock_Face_TopShelf.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Clock Face TopShelf/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Clock Face Top Shelf";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "gowtham.Clock-Face.TopShelf";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 26.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		9C8FFF0E3074F99700D9FD9D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Clock Face/Clock_Face.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
@@ -318,6 +449,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Clock Face/Clock_Face.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
@@ -543,9 +675,43 @@
 			};
 			name = Release;
 		};
+		C9BCCF5D56AD43C01E982069 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Clock Face TopShelf/Clock_Face_TopShelf.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Clock Face TopShelf/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Clock Face Top Shelf";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "gowtham.Clock-Face.TopShelf";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5FCECE2AA2E8262AFE52D109 /* Build configuration list for PBXNativeTarget "Clock Face TopShelf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7D565961CE5F89F2289A80D1 /* Release */,
+				C9BCCF5D56AD43C01E982069 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9C8FFEE43074F99600D9FD9D /* Build configuration list for PBXProject "Clock Face" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

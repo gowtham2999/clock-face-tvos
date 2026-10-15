@@ -22,12 +22,39 @@ final class TickSoundPlayer {
 
     func tick(source: ChimeSource, volume: Double) {
         guard let buffer = buffers[source] else { return }
+        play(buffer, volume: volume)
+    }
+
+    /// A rising three-note chime for reminders.
+    func chime(volume: Double) {
+        play(Self.makeChime(format: format), volume: volume)
+    }
+
+    private func play(_ buffer: AVAudioPCMBuffer, volume: Double) {
         if !engine.isRunning {
             do { try engine.start() } catch { return }
         }
         player.volume = Float(volume)
         player.scheduleBuffer(buffer, at: nil, options: .interrupts)
         if !player.isPlaying { player.play() }
+    }
+
+    private static func makeChime(format: AVAudioFormat) -> AVAudioPCMBuffer {
+        let notes: [(frequency: Double, start: Double)] = [(880, 0), (1108.73, 0.18), (1318.51, 0.36)]
+        let frameCount = AVAudioFrameCount(format.sampleRate * 1.4)
+        let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount)!
+        buffer.frameLength = frameCount
+        let samples = buffer.floatChannelData![0]
+        for frame in 0..<Int(frameCount) {
+            let t = Double(frame) / format.sampleRate
+            var value = 0.0
+            for note in notes where t >= note.start {
+                let local = t - note.start
+                value += sin(2 * .pi * note.frequency * local) * exp(-local * 4) * 0.28
+            }
+            samples[frame] = Float(value)
+        }
+        return buffer
     }
 
     private static func makeClick(

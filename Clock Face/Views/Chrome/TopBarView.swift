@@ -8,9 +8,13 @@ struct TopBarView: View {
         HStack(spacing: 20) {
             PillSegmentedControl(options: AppTab.allCases, selection: $selectedTab) { $0.displayName }
 
-            // Only the Watch tab has settings in this version.
-            PaletteButton(isSettingsOpen: $isSettingsOpen)
-                .disabled(selectedTab != .watch)
+            Spacer(minLength: 0)
+
+            WeatherPill()
+            DatePill()
+            CircleIconButton(systemName: "gearshape.fill", accessibilityLabel: "Settings", isActive: isSettingsOpen) {
+                isSettingsOpen.toggle()
+            }
         }
         .focusSection()
     }

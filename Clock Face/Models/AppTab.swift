@@ -1,17 +1,19 @@
 import Foundation
 
 enum AppTab: String, CaseIterable, Identifiable {
-    case watch
-    case focus
-    case worldTime
+    case clock
+    case faces
+    case sports
+    case world
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
-        case .watch: return "Watch"
-        case .focus: return "Focus"
-        case .worldTime: return "World Time"
+        case .clock: return "Clock"
+        case .faces: return "Faces"
+        case .sports: return "Sports"
+        case .world: return "World"
         }
     }
 }

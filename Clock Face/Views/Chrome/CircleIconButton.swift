@@ -1,16 +1,18 @@
 import SwiftUI
 
-struct PaletteButton: View {
-    @Binding var isSettingsOpen: Bool
+/// A round, icon-only chrome button (e.g. the settings gear).
+struct CircleIconButton: View {
+    let systemName: String
+    let accessibilityLabel: String
+    var isActive = false
+    let action: () -> Void
 
     var body: some View {
-        Button {
-            isSettingsOpen.toggle()
-        } label: {
-            Image(systemName: "paintpalette.fill")
+        Button(action: action) {
+            Image(systemName: systemName)
         }
-        .accessibilityLabel("Settings")
-        .buttonStyle(CircleChromeButtonStyle(isActive: isSettingsOpen))
+        .buttonStyle(CircleChromeButtonStyle(isActive: isActive))
+        .accessibilityLabel(accessibilityLabel)
     }
 }
 
@@ -26,6 +28,7 @@ private struct CircleChromeLabel: View {
     let configuration: ButtonStyleConfiguration
     let isActive: Bool
     @Environment(\.isFocused) private var isFocused
+    @Environment(\.chromeActivity) private var chromeActivity
     @Environment(\.isEnabled) private var isEnabled
 
     var body: some View {
@@ -33,16 +36,19 @@ private struct CircleChromeLabel: View {
             .font(.system(size: 26, weight: .semibold))
             .foregroundStyle(isFocused ? Color.inkInverse : Color.ink)
             .frame(width: 72, height: 72)
-            .background(Circle().fill(background))
+            .background {
+                if isFocused {
+                    Circle().fill(Color.ink)
+                } else {
+                    Circle().fill(.ultraThinMaterial)
+                        .overlay(Circle().fill(Color.ink.opacity(isActive ? 0.22 : 0)))
+                }
+            }
             .opacity(isEnabled ? 1 : 0.35)
             .scaleEffect(isFocused ? 1.1 : 1)
             .scaleEffect(configuration.isPressed ? 0.94 : 1)
             .animation(.easeOut(duration: 0.15), value: isFocused)
             .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
-    }
-
-    private var background: Color {
-        if isFocused { return .ink }
-        return isActive ? Color.ink.opacity(0.22) : Color.ink.opacity(0.08)
+            .onChange(of: isFocused) { chromeActivity() }
     }
 }

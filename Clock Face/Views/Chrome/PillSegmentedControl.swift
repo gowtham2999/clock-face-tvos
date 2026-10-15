@@ -20,7 +20,7 @@ struct PillSegmentedControl<Value: Hashable>: View {
             }
         }
         .padding(6)
-        .background(Capsule().fill(Color.ink.opacity(0.08)))
+        .background(.ultraThinMaterial, in: Capsule())
         .focusSection()
     }
 }
@@ -37,6 +37,7 @@ private struct PillSegmentLabel: View {
     let configuration: ButtonStyleConfiguration
     let isSelected: Bool
     @Environment(\.isFocused) private var isFocused
+    @Environment(\.chromeActivity) private var chromeActivity
 
     var body: some View {
         configuration.label
@@ -49,6 +50,7 @@ private struct PillSegmentLabel: View {
             .scaleEffect(configuration.isPressed ? 0.95 : 1)
             .animation(.easeOut(duration: 0.15), value: isFocused)
             .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
+            .onChange(of: isFocused) { chromeActivity() }
     }
 
     private var foreground: Color {

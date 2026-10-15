@@ -1,19 +1,21 @@
 import SwiftUI
 
-struct AccentColorSwatchRow: View {
-    @Binding var selection: AccentColorOption
+struct FaceColorSwatchRow: View {
+    let palette: [FaceColor]
+    let selectedID: String?
+    let onSelect: (FaceColor) -> Void
 
     var body: some View {
         HStack(spacing: 18) {
-            ForEach(AccentColorOption.allCases) { option in
+            ForEach(palette) { color in
                 Button {
-                    selection = option
+                    onSelect(color)
                 } label: {
-                    Circle().fill(option.color)
+                    Circle().fill(color.primary)
                 }
-                .buttonStyle(SwatchButtonStyle(isSelected: option == selection))
-                .accessibilityLabel(option.rawValue.capitalized)
-                .accessibilityAddTraits(option == selection ? .isSelected : [])
+                .buttonStyle(SwatchButtonStyle(isSelected: color.id == selectedID))
+                .accessibilityLabel(color.name)
+                .accessibilityAddTraits(color.id == selectedID ? .isSelected : [])
             }
         }
         .focusSection()
@@ -35,13 +37,11 @@ private struct SwatchLabel: View {
 
     var body: some View {
         configuration.label
-            .frame(width: 52, height: 52)
-            // Keeps a swatch visible when it matches the background (black on dark, white on light).
+            .frame(width: 56, height: 56)
+            // Keeps a swatch visible when it matches the background.
             .overlay(Circle().stroke(Color.ink.opacity(0.2), lineWidth: 1))
             .padding(6)
-            .overlay(
-                Circle().stroke(Color.ink, lineWidth: isSelected ? 3 : 0)
-            )
+            .overlay(Circle().stroke(Color.ink, lineWidth: isSelected ? 3 : 0))
             .scaleEffect(isFocused ? 1.18 : 1)
             .scaleEffect(configuration.isPressed ? 0.92 : 1)
             .shadow(color: Color.ink.opacity(isFocused ? 0.35 : 0), radius: 10)
