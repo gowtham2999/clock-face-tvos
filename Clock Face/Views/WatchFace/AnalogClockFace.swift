@@ -5,6 +5,7 @@ struct AnalogClockFace: WatchFace {
     let date: Date
 
     @Environment(AppSettings.self) private var settings
+    @Environment(\.faceBackground) private var faceBackground
 
     init(date: Date) {
         self.date = date
@@ -17,7 +18,7 @@ struct AnalogClockFace: WatchFace {
             let radius = min(proxy.size.width, proxy.size.height) / 2 * 0.95
 
             ZStack {
-                settings.theme.background
+                faceBackground ?? settings.theme.background
 
                 ClockNumeralsView(radius: radius)
 

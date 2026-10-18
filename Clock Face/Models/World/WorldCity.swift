@@ -26,6 +26,13 @@ struct WorldCity: Identifiable, Hashable {
 
     var timeZone: TimeZone { TimeZone(identifier: id) ?? .current }
 
+    /// Daytime is 6 AM to 6 PM local time in the city.
+    func isDaytime(at date: Date) -> Bool {
+        var calendar = Calendar.current
+        calendar.timeZone = timeZone
+        return (6..<18).contains(calendar.component(.hour, from: date))
+    }
+
     static func city(withID id: String) -> WorldCity? {
         catalog.first { $0.id == id }
     }

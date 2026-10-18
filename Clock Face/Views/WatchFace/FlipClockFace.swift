@@ -6,6 +6,7 @@ struct FlipClockFace: WatchFace {
     let date: Date
 
     @Environment(AppSettings.self) private var settings
+    @Environment(\.faceBackground) private var faceBackground
 
     init(date: Date) {
         self.date = date
@@ -26,7 +27,7 @@ struct FlipClockFace: WatchFace {
             let digitSize = min(boxHeight * 0.78, boxWidth * 1.05)
 
             ZStack {
-                settings.theme.background
+                faceBackground ?? settings.theme.background
 
                 HStack(spacing: spacing) {
                     tile(cornerRadius: size.height * 0.046) {
@@ -57,7 +58,8 @@ struct FlipClockFace: WatchFace {
 
     private func tile<Content: View>(cornerRadius: CGFloat, @ViewBuilder content: () -> Content) -> some View {
         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-            .fill(settings.theme.surface)
+            // Inside a dashboard tile the tile is already the surface colour, so lift the boxes.
+            .fill(faceBackground == nil ? settings.theme.surface : Color.ink.opacity(0.07))
             .overlay(content())
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

@@ -273,3 +273,30 @@ struct SolarCalculatorTests {
         }
     }
 }
+
+struct MoonPhaseTests {
+    @Test func newMoonIsDarkAndFullMoonIsLit() {
+        // Total solar eclipse (new moon) 8 Apr 2024 18:21 UTC; full moon 25 Jan 2024 17:54 UTC.
+        let new = MoonPhase(at: date("2024-04-08T18:21:00Z"))
+        #expect(new.illumination < 0.01)
+        #expect(new.name == .newMoon)
+        let full = MoonPhase(at: date("2024-01-25T17:54:00Z"))
+        #expect(full.illumination > 0.99)
+        #expect(full.name == .fullMoon)
+    }
+
+    @Test func firstQuarterIsHalfLitAndWaxing() {
+        // First quarter 18 Jan 2024 03:52 UTC.
+        let quarter = MoonPhase(at: date("2024-01-18T03:52:00Z"))
+        #expect(abs(quarter.illumination - 0.5) < 0.03)
+        #expect(quarter.isWaxing)
+        #expect(quarter.name == .firstQuarter)
+    }
+
+    @Test func findsTheNextFullMoonWithinAFewHours() throws {
+        let next = try #require(MoonPhase.next(.fullMoon, after: date("2024-01-20T00:00:00Z")))
+        #expect(abs(next.timeIntervalSince(date("2024-01-25T17:54:00Z"))) < 3 * 3600)
+        let nextNew = try #require(MoonPhase.next(.newMoon, after: date("2024-04-01T00:00:00Z")))
+        #expect(abs(nextNew.timeIntervalSince(date("2024-04-08T18:21:00Z"))) < 3 * 3600)
+    }
+}

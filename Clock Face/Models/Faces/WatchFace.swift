@@ -6,3 +6,9 @@ import SwiftUI
 protocol WatchFace: View {
     init(date: Date)
 }
+
+extension EnvironmentValues {
+    /// Replaces the theme background behind faces that paint one, so a face shown
+    /// inside a dashboard tile blends with the tile instead of punching a hole in it.
+    @Entry var faceBackground: Color?
+}

@@ -27,6 +27,14 @@ enum AppTheme: String, CaseIterable, Identifiable {
         }
     }
 
+    /// Fill for the Home dashboard's tiles.
+    var tile: Color {
+        switch self {
+        case .dark: return Color(white: 0.125)
+        case .light: return Color(white: 0.955)
+        }
+    }
+
     /// Fill for raised panels such as the flip clock's digit boxes.
     var surface: Color {
         switch self {

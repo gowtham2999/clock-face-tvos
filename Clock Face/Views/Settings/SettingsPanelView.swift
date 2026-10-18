@@ -18,6 +18,12 @@ struct SettingsPanelView: View {
                 $0 ? "24-Hour" : "12-Hour"
             }
 
+            SettingsSectionLabel(text: "Open to")
+                .padding(.top, 20)
+            PillSegmentedControl(options: [AppTab.home, .clock], selection: $settings.launchTab) {
+                $0 == .home ? "Dashboard" : "Clock face"
+            }
+
             SettingsSectionLabel(text: "Burn-in protection")
                 .padding(.top, 20)
             PillSegmentedControl(options: [true, false], selection: $settings.pixelShiftEnabled) {

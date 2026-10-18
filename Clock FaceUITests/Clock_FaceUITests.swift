@@ -9,7 +9,7 @@ import XCTest
 
 final class Clock_FaceUITests: XCTestCase {
     private let remote = XCUIRemote.shared
-    private let tabs = ["Clock", "Faces", "Sports", "World"]
+    private let tabs = ["Home", "Clock", "Faces", "Sports", "World"]
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -41,6 +41,34 @@ final class Clock_FaceUITests: XCTestCase {
         remote.press(.select)
         expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: clockTab)
         waitForExpectations(timeout: 3)
+    }
+
+    // MARK: - Home
+
+    @MainActor
+    func testDashboardOpensTheClockAndBackReturns() throws {
+        // Later arguments win, so this overrides the default Clock launch tab.
+        let app = launch(extraArguments: ["-launchTab", "home", "-UITestSampleWeather", "YES"])
+        let homeCanvas = app.descendants(matching: .any)["homeCanvas"]
+        XCTAssertTrue(homeCanvas.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["weatherTile"].exists)
+        XCTAssertTrue(app.staticTexts["moonPhase"].exists)
+        attachScreenshot(app, named: "home-dashboard")
+
+        // Swiping changes the face in the clock tile, without leaving Home.
+        remote.press(.right)
+        XCTAssertTrue(homeCanvas.exists)
+
+        remote.press(.select)
+        let clockCanvas = app.descendants(matching: .any)["clockCanvas"]
+        XCTAssertTrue(clockCanvas.waitForExistence(timeout: 3))
+        XCTAssertFalse(homeCanvas.exists)
+        // The clock arrives immersive, with the top bar hidden.
+        XCTAssertFalse(app.buttons["Home"].isEnabled)
+        attachScreenshot(app, named: "home-zoomed-clock")
+
+        remote.press(.menu)
+        XCTAssertTrue(homeCanvas.waitForExistence(timeout: 3))
     }
 
     @MainActor
@@ -150,7 +178,7 @@ final class Clock_FaceUITests: XCTestCase {
     func testSettingsPanelSwitchesTheme() throws {
         let app = launch()
         moveFocusIntoTopBar(of: app)
-        press(.right, times: 5)
+        press(.right, times: tabs.count + 1)
         let gear = app.buttons["Settings"]
         XCTAssertTrue(gear.hasFocus, focusedLabel(app))
         remote.press(.select)
@@ -181,6 +209,7 @@ final class Clock_FaceUITests: XCTestCase {
             "-myFaces", "(analogClassic,essential,tint,flip)",
             "-theme", "dark", "-uses24HourTime", "NO",
             "-chimeSource", "mute", "-volume", "1", "-pixelShiftEnabled", "NO",
+            "-launchTab", "clock",
         ] + extraArguments
         app.launch()
         return app

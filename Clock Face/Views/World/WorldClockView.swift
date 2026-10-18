@@ -56,7 +56,7 @@ private struct CityCard: View {
 
     var body: some View {
         let time = TimeFormatting.parts(now, in: city.timeZone, uses24Hour: uses24Hour)
-        let isDaytime = Self.isDaytime(at: now, in: city.timeZone)
+        let isDaytime = city.isDaytime(at: now)
 
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top) {
@@ -106,12 +106,5 @@ private struct CityCard: View {
         )
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("cityCard")
-    }
-
-    private static func isDaytime(at date: Date, in timeZone: TimeZone) -> Bool {
-        var calendar = Calendar.current
-        calendar.timeZone = timeZone
-        let hour = calendar.component(.hour, from: date)
-        return (6..<18).contains(hour)
     }
 }

@@ -13,6 +13,7 @@ final class AppSettings {
         static let volume = "volume"
         static let pixelShiftEnabled = "pixelShiftEnabled"
         static let worldCities = "worldCities"
+        static let launchTab = "launchTab"
     }
 
     @ObservationIgnored private let defaults: UserDefaults
@@ -53,6 +54,11 @@ final class AppSettings {
         didSet { defaults.set(pixelShiftEnabled, forKey: Keys.pixelShiftEnabled) }
     }
 
+    /// The screen the app opens to: the Home dashboard or the full-screen clock.
+    var launchTab: AppTab {
+        didSet { defaults.set(launchTab.rawValue, forKey: Keys.launchTab) }
+    }
+
     /// Time zone IDs shown on the World tab, at most `WorldCity.maximumSelection`.
     private(set) var worldCityIDs: [String] {
         didSet { defaults.set(worldCityIDs, forKey: Keys.worldCities) }
@@ -71,6 +77,8 @@ final class AppSettings {
         volume = defaults.object(forKey: Keys.volume) != nil ? defaults.double(forKey: Keys.volume) : 1.0
         pixelShiftEnabled = defaults.object(forKey: Keys.pixelShiftEnabled) != nil
             ? defaults.bool(forKey: Keys.pixelShiftEnabled) : true
+        let storedLaunchTab = defaults.string(forKey: Keys.launchTab).flatMap(AppTab.init(rawValue:))
+        launchTab = storedLaunchTab == .clock ? .clock : .home
         let storedCities = (defaults.stringArray(forKey: Keys.worldCities) ?? []).filter { WorldCity.city(withID: $0) != nil }
         worldCityIDs = storedCities.isEmpty ? WorldCity.defaultSelection : storedCities
 
@@ -119,7 +127,7 @@ final class AppSettings {
     // MARK: - World clock
 
     var worldCities: [WorldCity] {
-        worldCityIDs.compactMap(WorldCity.city(withID:))
+        worldCityIDs.compactMap { WorldCity.city(withID: $0) }
     }
 
     func isWorldCitySelected(_ city: WorldCity) -> Bool {
