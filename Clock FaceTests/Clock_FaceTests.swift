@@ -300,3 +300,96 @@ struct MoonPhaseTests {
         #expect(abs(nextNew.timeIntervalSince(date("2024-04-08T18:21:00Z"))) < 3 * 3600)
     }
 }
+
+struct FaceMathTests {
+    @Test func subsolarPointFollowsTheSeasonsAndTheClock() {
+        // June solstice at noon UTC: sun over the Tropic of Cancer near Greenwich.
+        let june = WorldFace.subsolarPoint(at: date("2026-06-21T12:00:00Z"))
+        #expect(abs(june.latitude - 23.44) < 0.3)
+        #expect(abs(june.longitude) < 1.5)
+        // March equinox, 18:00 UTC: over the equator, 90° west.
+        let march = WorldFace.subsolarPoint(at: date("2026-03-20T18:00:00Z"))
+        #expect(abs(march.latitude) < 0.5)
+        #expect(abs(march.longitude + 90) < 2.5)
+    }
+
+    @Test func solarArcProgressRunsFromSunriseToSunset() {
+        let sunrise = date("2026-10-18T06:30:00Z")
+        let sunset = date("2026-10-18T18:30:00Z")
+        #expect(SolarArcFace.dayProgress(date: date("2026-10-18T12:30:00Z"), sunrise: sunrise, sunset: sunset) == 0.5)
+        #expect(SolarArcFace.dayProgress(date: date("2026-10-18T20:00:00Z"), sunrise: sunrise, sunset: sunset) == nil)
+    }
+
+    @Test func monthLayoutPadsToWholeWeeks() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = 1
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        // October 2026 starts on a Thursday.
+        let layout = MonthLayout(for: date("2026-10-18T12:00:00Z"), calendar: calendar)
+        #expect(layout.weeks.count == 5)
+        #expect(layout.weeks[0] == [nil, nil, nil, nil, 1, 2, 3])
+        #expect(layout.weeks.allSatisfy { $0.count == 7 })
+    }
+
+    @Test func worldMapHasLandAndEveryCityHasCoordinates() {
+        #expect(WorldDotMap.landDots.count > 1500)
+        #expect(WorldCity.catalog.allSatisfy { abs($0.latitude) <= 90 && abs($0.longitude) <= 180 && ($0.latitude, $0.longitude) != (0, 0) })
+    }
+}
+
+struct WeatherSnapshotTests {
+    private func snapshot(fetchedAt: Date, hours: Int = 25) -> WeatherSnapshot {
+        WeatherSnapshot(
+            fetchedAt: fetchedAt, latitude: 19.076, longitude: 72.8777, placeName: "Mumbai",
+            hours: (0..<hours).map { index in
+                WeatherSnapshot.Hour(
+                    date: fetchedAt.addingTimeInterval(Double(index) * 3600), temperature: 20 + Double(index),
+                    symbolName: "sun.max.fill", condition: "Sunny", humidity: 0.5, pressure: 1010,
+                    uvIndex: 3, precipitationChance: 0.1
+                )
+            },
+            days: []
+        )
+    }
+
+    @Test func readsTheHourContainingTheMoment() {
+        let start = date("2026-10-23T06:00:00Z")
+        let forecast = snapshot(fetchedAt: start)
+        #expect(forecast.hour(at: start.addingTimeInterval(2.5 * 3600))?.temperature == 22)
+        #expect(forecast.hour(at: start.addingTimeInterval(-60)) == nil)
+    }
+
+    @Test func refreshesAfterSixHoursOrWhenTheForecastRunsOut() {
+        let start = date("2026-10-23T06:00:00Z")
+        let forecast = snapshot(fetchedAt: start)
+        #expect(!forecast.needsRefresh(at: start.addingTimeInterval(5.9 * 3600)))
+        #expect(forecast.needsRefresh(at: start.addingTimeInterval(6 * 3600)))
+        // Only three hours of forecast: refresh once the next hour isn't covered.
+        let short = snapshot(fetchedAt: start, hours: 3)
+        #expect(!short.needsRefresh(at: start.addingTimeInterval(1.5 * 3600)))
+        #expect(short.needsRefresh(at: start.addingTimeInterval(2.5 * 3600)))
+    }
+
+    @Test func appliesOnlyNearWhereItWasFetched() {
+        let forecast = snapshot(fetchedAt: .now)
+        #expect(forecast.isNear(latitude: 19.1, longitude: 72.9))     // a few km away
+        #expect(!forecast.isNear(latitude: 18.52, longitude: 73.86))  // Pune, ~120 km
+    }
+
+    @Test func savedForecastSurvivesARelaunch() {
+        let defaults = UserDefaults(suiteName: "WeatherSnapshotTests-\(UUID().uuidString)")!
+        let forecast = snapshot(fetchedAt: date("2026-10-23T06:00:00Z"))
+        defaults.set(try! JSONEncoder().encode(forecast), forKey: "weatherSnapshot")
+        let store = WeatherStore(defaults: defaults)
+        #expect(store.snapshot == forecast)
+        #expect(store.conditions(at: date("2026-10-23T07:30:00Z"))?.temperature == 21)
+    }
+
+    @Test func uvLevelsFollowTheStandardBands() {
+        #expect(UVLevel(index: 2) == .low)
+        #expect(UVLevel(index: 5) == .moderate)
+        #expect(UVLevel(index: 7) == .high)
+        #expect(UVLevel(index: 10) == .veryHigh)
+        #expect(UVLevel(index: 11) == .extreme)
+    }
+}

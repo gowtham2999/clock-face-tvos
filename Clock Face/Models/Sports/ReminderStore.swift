@@ -30,7 +30,7 @@ final class ReminderStore {
     static let leadTime: TimeInterval = 15 * 60
     /// How long after the start a reminder that couldn't be shown still pops up.
     static let lateWindow: TimeInterval = 5 * 60
-    static let appGroupID = "group.gowtham.Clock-Face"
+    static let appGroupID = "group.ai.botagentica.clockface"
     private static let storageKey = "reminders"
 
     private(set) var reminders: [Reminder] = []

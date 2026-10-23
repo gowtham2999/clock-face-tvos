@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.gowtham.Clock-Face</string>
+		<string>group.ai.botagentica.clockface</string>
 	</array>
 </dict>
 </plist>

@@ -31,20 +31,24 @@ struct DatePill: View {
 }
 
 /// Shows the current temperature; hidden entirely until weather is available.
+/// Re-reads the saved forecast each minute so it moves on as the hours pass.
 struct WeatherPill: View {
     @Environment(WeatherStore.self) private var weather
 
     var body: some View {
-        if let temperature = weather.formattedTemperature {
-            InfoPill {
-                HStack(spacing: 10) {
-                    Text(temperature)
-                    Image(systemName: weather.symbolName ?? "cloud")
-                        .symbolRenderingMode(.multicolor)
+        TimelineView(.everyMinute) { context in
+            if let now = weather.conditions(at: context.date) {
+                let temperature = WeatherStore.format(Measurement(value: now.temperature, unit: .celsius))
+                InfoPill {
+                    HStack(spacing: 10) {
+                        Text(temperature)
+                        Image(systemName: now.symbolName)
+                            .symbolRenderingMode(.multicolor)
+                    }
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Weather \(temperature)")
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("Weather \(temperature)")
         }
     }
 }

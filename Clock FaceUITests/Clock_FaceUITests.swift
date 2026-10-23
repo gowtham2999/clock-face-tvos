@@ -209,7 +209,7 @@ final class Clock_FaceUITests: XCTestCase {
             "-myFaces", "(analogClassic,essential,tint,flip)",
             "-theme", "dark", "-uses24HourTime", "NO",
             "-chimeSource", "mute", "-volume", "1", "-pixelShiftEnabled", "NO",
-            "-launchTab", "clock",
+            "-launchTab", "clock", "-skipLaunchAnimation", "YES",
         ] + extraArguments
         app.launch()
         return app

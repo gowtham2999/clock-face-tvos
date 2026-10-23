@@ -10,6 +10,16 @@ enum WatchFaceType: String, CaseIterable, Identifiable {
     case tint
     case daylight
     case flip
+    case circle
+    case bold
+    case minimal
+    case serifModern
+    case dualTime
+    case solarArc
+    case calendar
+    case weather
+    case world
+    case orbit
 
     var id: String { rawValue }
 
@@ -22,6 +32,16 @@ enum WatchFaceType: String, CaseIterable, Identifiable {
         case .tint: return "Tint"
         case .daylight: return "Daylight"
         case .flip: return "Flip"
+        case .circle: return "Circle"
+        case .bold: return "Bold"
+        case .minimal: return "Minimal"
+        case .serifModern: return "Serif Modern"
+        case .dualTime: return "Dual Time"
+        case .solarArc: return "Solar Arc"
+        case .calendar: return "Calendar"
+        case .weather: return "Weather"
+        case .world: return "World"
+        case .orbit: return "Orbit"
         }
     }
 
@@ -41,17 +61,43 @@ enum WatchFaceType: String, CaseIterable, Identifiable {
             return "A luminous dial whose light follows the sun across the day."
         case .flip:
             return "Big hours and minutes in two tiles, inspired by desk flip clocks."
+        case .circle:
+            return "A fine-ticked dial where the seconds sweep round as a glowing trail."
+        case .bold:
+            return "Heavy stacked hours and minutes, set large like a poster."
+        case .minimal:
+            return "Just the time in a single thin line, with the date beneath."
+        case .serifModern:
+            return "Elegant high-contrast serif numerals, staggered like a magazine cover."
+        case .dualTime:
+            return "Your time, stacked large, beside the time in four other cities."
+        case .solarArc:
+            return "The sun travels an arc over the mountains, from sunrise to sunset."
+        case .calendar:
+            return "Today's date in large type next to the month, with the time."
+        case .weather:
+            return "Current conditions and today's high and low beside a clean dial."
+        case .world:
+            return "A dotted world map lit by the sun, with the time in your cities."
+        case .orbit:
+            return "The planets on their orbits around the Sun, in today's real positions."
         }
     }
 
     /// Faces that show weather or follow the sun; location is only requested once one is on screen.
     var usesLocation: Bool {
-        self == .essential || self == .station || self == .sky
+        switch self {
+        case .essential, .station, .sky, .solarArc, .weather: return true
+        default: return false
+        }
     }
 
     /// Faces whose look changes through the day, which get a "Play a Day" preview.
     var followsTheSun: Bool {
-        self == .sky || self == .daylight
+        switch self {
+        case .sky, .daylight, .solarArc, .world: return true
+        default: return false
+        }
     }
 
     /// Shown on the detail screen for faces without a colour palette.
@@ -59,15 +105,19 @@ enum WatchFaceType: String, CaseIterable, Identifiable {
         switch self {
         case .sky: return "Colours follow the sun at your location, from night through every twilight to midday."
         case .flip: return "Follows the Light and Dark theme in Settings."
+        case .solarArc: return "The sky and the sun's place on the arc follow the real sun at your location."
+        case .orbit: return "Planet positions are calculated for today, so the scene slowly changes through the year."
         default: return nil
         }
     }
 
     var collection: FaceCollection {
         switch self {
-        case .analogClassic, .essential, .station: return .analog
-        case .sky, .tint, .daylight: return .colourAndLight
-        case .flip: return .digital
+        case .analogClassic, .essential, .station, .circle: return .analog
+        case .flip, .bold, .minimal, .serifModern, .dualTime: return .digital
+        case .sky, .tint, .daylight, .solarArc: return .colourAndLight
+        case .calendar, .weather, .world: return .information
+        case .orbit: return .space
         }
     }
 
@@ -115,7 +165,40 @@ enum WatchFaceType: String, CaseIterable, Identifiable {
                 FaceColor(id: "graphite", name: "Graphite", primary: Color(hex: 0x121417), secondary: Color(hex: 0xC9D1D9)),
                 FaceColor(id: "dawn", name: "Dawn", primary: Color(hex: 0x2A1631), secondary: Color(hex: 0xF2B38A)),
             ]
-        case .sky, .flip:
+        case .circle, .weather:
+            // primary = accent (second hand, seconds trail)
+            return [
+                FaceColor(id: "orange", name: "Orange", primary: Color(hex: 0xFF9F0A)),
+                FaceColor(id: "red", name: "Red", primary: Color(hex: 0xFF453A)),
+                FaceColor(id: "mint", name: "Mint", primary: Color(hex: 0x66D4CF)),
+                FaceColor(id: "blue", name: "Blue", primary: Color(hex: 0x64A8FF)),
+            ]
+        case .bold, .minimal, .dualTime:
+            // primary = type colour
+            return [
+                FaceColor(id: "cream", name: "Cream", primary: Color(hex: 0xEDE6DA)),
+                FaceColor(id: "white", name: "White", primary: .white),
+                FaceColor(id: "orange", name: "Orange", primary: Color(hex: 0xFF9F0A)),
+                FaceColor(id: "mint", name: "Mint", primary: Color(hex: 0x8CE0C4)),
+                FaceColor(id: "rose", name: "Rose", primary: Color(hex: 0xFF8FA3)),
+            ]
+        case .serifModern:
+            // primary = numeral colour
+            return [
+                FaceColor(id: "ivory", name: "Ivory", primary: Color(hex: 0xF3ECDF)),
+                FaceColor(id: "white", name: "White", primary: .white),
+                FaceColor(id: "gold", name: "Gold", primary: Color(hex: 0xD9B77E)),
+                FaceColor(id: "rose", name: "Rose", primary: Color(hex: 0xE8B4A8)),
+            ]
+        case .calendar, .world:
+            // primary = accent (today, city dots)
+            return [
+                FaceColor(id: "amber", name: "Amber", primary: Color(hex: 0xF5A243)),
+                FaceColor(id: "red", name: "Red", primary: Color(hex: 0xFF453A)),
+                FaceColor(id: "teal", name: "Teal", primary: Color(hex: 0x40C8E0)),
+                FaceColor(id: "green", name: "Green", primary: Color(hex: 0x6CD67E)),
+            ]
+        case .sky, .flip, .solarArc, .orbit:
             return []
         }
     }
@@ -123,8 +206,10 @@ enum WatchFaceType: String, CaseIterable, Identifiable {
 
 enum FaceCollection: String, CaseIterable, Identifiable {
     case analog
-    case colourAndLight
     case digital
+    case colourAndLight
+    case information
+    case space
 
     var id: String { rawValue }
 
@@ -133,6 +218,8 @@ enum FaceCollection: String, CaseIterable, Identifiable {
         case .analog: return "Analog"
         case .colourAndLight: return "Colour & Light"
         case .digital: return "Digital"
+        case .information: return "Information"
+        case .space: return "Space"
         }
     }
 

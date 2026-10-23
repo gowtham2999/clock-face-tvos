@@ -2,8 +2,9 @@ import CoreLocation
 import SwiftUI
 import WeatherKit
 
-/// Current conditions, the next six hours and the next five days. Without
-/// WeatherKit data it shows the day's sun times instead, computed on device.
+/// Today's weather, read hour by hour from the saved forecast: the temperature and
+/// conditions up top, then six details in a quiet two-column grid. Without a
+/// forecast it shows the day's sun times instead, computed on device.
 struct WeatherTile: View {
     let date: Date
 
@@ -12,187 +13,152 @@ struct WeatherTile: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
+        let now = weather.conditions(at: date)
+
         DashboardTile {
             VStack(alignment: .leading, spacing: 0) {
-                header
-                if weather.hasForecast {
-                    forecast
+                header(hasForecast: now != nil)
+                Spacer(minLength: 16)
+                if let now {
+                    hero(now)
                 } else {
-                    sunTimes
+                    unavailable
                 }
+                Spacer(minLength: 16)
+                Rectangle()
+                    .fill(Color.ink.opacity(0.1))
+                    .frame(height: 1)
+                    .padding(.bottom, 28)
+                MetricGrid(metrics: now.map { metrics(for: $0) } ?? sunMetrics)
             }
         }
         .accessibilityIdentifier("weatherTile")
     }
 
-    private var header: some View {
-        HStack(alignment: .firstTextBaseline) {
-            if let place = weather.placeName {
-                Label {
-                    Text(place)
-                } icon: {
-                    Image(systemName: "location.fill")
-                        .font(.system(size: 22))
-                }
-                .labelStyle(TrailingIconLabelStyle())
-                .font(.system(size: 32, weight: .semibold))
+    // MARK: Header
+
+    private func header(hasForecast: Bool) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text(weather.placeName ?? "Weather")
+                .font(.system(size: 30, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-            } else {
-                Text("Today")
-                    .font(.system(size: 32, weight: .semibold))
+            if weather.placeName != nil {
+                Image(systemName: "location.fill")
+                    .font(.system(size: 18))
+                    .opacity(0.5)
             }
             Spacer(minLength: 16)
-            attributionMark
+            if hasForecast {
+                attributionMark
+            }
         }
     }
 
-    // MARK: Forecast
+    // MARK: Hero
 
-    @ViewBuilder
-    private var forecast: some View {
-        HStack(alignment: .center) {
-            Text(weather.formattedTemperature ?? "")
-                .font(.system(size: 120, weight: .semibold))
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-            Spacer(minLength: 12)
-            VStack(alignment: .trailing, spacing: 6) {
-                Image(systemName: weather.symbolName ?? "cloud")
-                    .symbolRenderingMode(.multicolor)
-                    .font(.system(size: 60))
-                if let condition = weather.conditionDescription {
-                    Text(condition)
-                        .font(.system(size: 26, weight: .medium))
-                        .lineLimit(1)
-                }
-                if let high = weather.todayHigh, let low = weather.todayLow {
-                    Text("H:\(WeatherStore.format(high))  L:\(WeatherStore.format(low))")
+    private func hero(_ now: WeatherSnapshot.Hour) -> some View {
+        let today = weather.today(at: date)
+
+        return HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(WeatherStore.format(Measurement(value: now.temperature, unit: .celsius)))
+                    .font(.system(size: 132, weight: .light))
+                    .tracking(-3)
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .padding(.leading, -6)
+                Text(now.condition)
+                    .font(.system(size: 28, weight: .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                if let today {
+                    Text("H \(WeatherStore.format(Measurement(value: today.high, unit: .celsius)))   L \(WeatherStore.format(Measurement(value: today.low, unit: .celsius)))")
                         .font(.system(size: 24))
-                        .opacity(0.7)
-                }
-            }
-        }
-        .padding(.top, 4)
-
-        divider
-
-        HStack(spacing: 0) {
-            ForEach(Array(weather.hourly.enumerated()), id: \.element.id) { index, hour in
-                VStack(spacing: 10) {
-                    Text(index == 0 ? "Now" : hourLabel(hour.date))
-                        .font(.system(size: 21, weight: .semibold))
-                        .opacity(0.7)
-                    Image(systemName: hour.symbolName)
-                        .symbolRenderingMode(.multicolor)
-                        .font(.system(size: 28))
-                        .frame(height: 34)
-                    Text(WeatherStore.format(hour.temperature))
-                        .font(.system(size: 24, weight: .medium))
                         .monospacedDigit()
+                        .opacity(0.55)
                 }
-                .frame(maxWidth: .infinity)
             }
+            Spacer(minLength: 12)
+            Image(systemName: now.symbolName)
+                .symbolRenderingMode(.multicolor)
+                .font(.system(size: 76))
+                .padding(.top, 24)
         }
-
-        divider
-
-        VStack(spacing: 6) {
-            ForEach(weather.daily) { day in
-                HStack {
-                    Text(day.date.formatted(.dateTime.weekday(.wide)))
-                        .font(.system(size: 25))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .layoutPriority(1)
-                    Spacer(minLength: 8)
-                    Image(systemName: day.symbolName)
-                        .symbolRenderingMode(.multicolor)
-                        .font(.system(size: 26))
-                        .frame(width: 60)
-                    Text(WeatherStore.format(day.high))
-                        .font(.system(size: 25, weight: .medium))
-                        .frame(width: 70, alignment: .trailing)
-                    Text(WeatherStore.format(day.low))
-                        .font(.system(size: 25))
-                        .opacity(0.5)
-                        .frame(width: 70, alignment: .trailing)
-                }
-                .monospacedDigit()
-                .frame(height: 40)
-            }
-        }
-        Spacer(minLength: 0)
+        .animation(.easeInOut(duration: 0.6), value: now)
     }
 
-    private var divider: some View {
-        Rectangle()
-            .fill(Color.ink.opacity(0.1))
-            .frame(height: 1)
-            .padding(.vertical, 22)
-    }
-
-    private func hourLabel(_ date: Date) -> String {
-        if settings.uses24HourTime {
-            return date.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)))
+    private var unavailable: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Image(systemName: "cloud.sun")
+                .font(.system(size: 54))
+                .symbolRenderingMode(.hierarchical)
+                .opacity(0.5)
+            Text("Weather unavailable")
+                .font(.system(size: 30, weight: .medium))
+            Text("Appears once this TV can use its location and the internet.")
+                .font(.system(size: 21))
+                .opacity(0.5)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        return date.formatted(.dateTime.hour(.defaultDigits(amPM: .abbreviated)))
     }
 
-    // MARK: Sun times (fallback)
+    // MARK: Metrics
 
-    @ViewBuilder
-    private var sunTimes: some View {
+    private func metrics(for now: WeatherSnapshot.Hour) -> [Metric] {
+        let today = weather.today(at: date)
+        let uv = today?.uvIndex ?? now.uvIndex
+        let rain = today?.precipitationChance ?? now.precipitationChance
+        let pressure = WeatherStore.formatPressure(hectopascals: now.pressure)
+        let sun = sunTimes
+
+        return [
+            Metric(label: "Peak UV", symbol: "sun.max", value: "\(uv)", unit: UVLevel(index: uv).rawValue),
+            Metric(label: "Rain", symbol: "umbrella", value: percent(rain), unit: "%"),
+            Metric(label: "Humidity", symbol: "humidity", value: percent(now.humidity), unit: "%"),
+            Metric(label: "Pressure", symbol: "gauge.with.dots.needle.50percent", value: pressure.value, unit: pressure.unit),
+            timeMetric(label: "Sunrise", symbol: "sunrise", sun.sunrise),
+            timeMetric(label: "Sunset", symbol: "sunset", sun.sunset),
+        ]
+    }
+
+    /// Shown without a forecast: everything here is calculated on the TV.
+    private var sunMetrics: [Metric] {
+        let sun = sunTimes
+        var daylight = Metric(label: "Daylight", symbol: "clock", value: "—")
+        if let sunrise = sun.sunrise, let sunset = sun.sunset {
+            let minutes = Int(sunset.timeIntervalSince(sunrise) / 60)
+            daylight = Metric(label: "Daylight", symbol: "clock", value: "\(minutes / 60)h \(minutes % 60)m")
+        }
+        return [
+            timeMetric(label: "Sunrise", symbol: "sunrise", sun.sunrise),
+            timeMetric(label: "Sunset", symbol: "sunset", sun.sunset),
+            timeMetric(label: "Solar Noon", symbol: "sun.max", sun.noon),
+            daylight,
+        ]
+    }
+
+    private var sunTimes: (sunrise: Date?, sunset: Date?, noon: Date?) {
         let coordinate = weather.location.map { GeoCoordinate(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude) }
             ?? .approximate(for: .current, at: date)
         let events = SolarCalculator.events(on: date, coordinate: coordinate, timeZone: .current)
-        let sunrise = events.first { $0.event == .sunriseStarts }?.date
-        let sunset = events.first { $0.event == .sunsetEnds }?.date
-        let noon = events.first { $0.event == .solarNoon }?.date
-
-        Spacer(minLength: 0)
-        VStack(alignment: .leading, spacing: 30) {
-            sunRow("sunrise.fill", title: "Sunrise", value: sunrise)
-            sunRow("sun.max.fill", title: "Solar noon", value: noon)
-            sunRow("sunset.fill", title: "Sunset", value: sunset)
-            if let sunrise, let sunset {
-                let length = sunset.timeIntervalSince(sunrise)
-                HStack(spacing: 20) {
-                    Image(systemName: "clock")
-                        .font(.system(size: 34))
-                        .frame(width: 56)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Daylight")
-                            .font(.system(size: 22, weight: .semibold))
-                            .opacity(0.6)
-                        Text("\(Int(length / 3600))h \(Int(length.truncatingRemainder(dividingBy: 3600) / 60))m")
-                            .font(.system(size: 40, weight: .medium))
-                    }
-                }
-            }
-        }
-        Spacer(minLength: 0)
-        Text("Weather appears once location and internet are available.")
-            .font(.system(size: 20))
-            .opacity(0.45)
+        return (
+            events.first { $0.event == .sunriseStarts }?.date,
+            events.first { $0.event == .sunsetEnds }?.date,
+            events.first { $0.event == .solarNoon }?.date
+        )
     }
 
-    private func sunRow(_ symbol: String, title: String, value: Date?) -> some View {
-        HStack(spacing: 20) {
-            Image(systemName: symbol)
-                .symbolRenderingMode(.multicolor)
-                .font(.system(size: 34))
-                .frame(width: 56)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 22, weight: .semibold))
-                    .opacity(0.6)
-                Text(value.map { TimeFormatting.string($0, uses24Hour: settings.uses24HourTime) } ?? "—")
-                    .font(.system(size: 40, weight: .medium))
-                    .monospacedDigit()
-            }
-        }
+    private func timeMetric(label: String, symbol: String, _ moment: Date?) -> Metric {
+        guard let moment else { return Metric(label: label, symbol: symbol, value: "—") }
+        let parts = TimeFormatting.parts(moment, uses24Hour: settings.uses24HourTime)
+        return Metric(label: label, symbol: symbol, value: parts.time, unit: parts.period)
+    }
+
+    private func percent(_ fraction: Double) -> String {
+        "\(Int((fraction * 100).rounded()))"
     }
 
     // MARK: Attribution
@@ -200,29 +166,66 @@ struct WeatherTile: View {
     /// WeatherKit requires the Apple Weather mark wherever its data appears.
     @ViewBuilder
     private var attributionMark: some View {
-        if weather.hasForecast {
-            if let attribution = weather.attribution {
-                AsyncImage(url: colorScheme == .dark ? attribution.combinedMarkDarkURL : attribution.combinedMarkLightURL) { image in
-                    image.resizable().scaledToFit()
-                } placeholder: {
-                    Text(attribution.serviceName)
-                }
-                .frame(height: 18)
-                .opacity(0.6)
-            } else {
-                Text("\u{F8FF}Weather")
-                    .font(.system(size: 18, weight: .medium))
-                    .opacity(0.5)
+        if let attribution = weather.attribution {
+            AsyncImage(url: colorScheme == .dark ? attribution.combinedMarkDarkURL : attribution.combinedMarkLightURL) { image in
+                image.resizable().scaledToFit()
+            } placeholder: {
+                Text(attribution.serviceName)
             }
+            .frame(height: 18)
+            .opacity(0.5)
+        } else {
+            Text("\u{F8FF}Weather")
+                .font(.system(size: 18, weight: .medium))
+                .opacity(0.45)
         }
     }
 }
 
-private struct TrailingIconLabelStyle: LabelStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            configuration.title
-            configuration.icon
+// MARK: - Metric grid
+
+private struct Metric: Identifiable {
+    let label: String
+    let symbol: String
+    let value: String
+    var unit: String?
+
+    var id: String { label }
+}
+
+/// Two columns of small labelled values: a quiet caption with a monochrome
+/// symbol, then the value with its unit set smaller beside it.
+private struct MetricGrid: View {
+    let metrics: [Metric]
+
+    private let columns = [GridItem(.flexible(), spacing: 24, alignment: .leading), GridItem(.flexible(), spacing: 24, alignment: .leading)]
+
+    var body: some View {
+        LazyVGrid(columns: columns, alignment: .leading, spacing: 30) {
+            ForEach(metrics) { metric in
+                VStack(alignment: .leading, spacing: 6) {
+                    Label(metric.label.uppercased(), systemImage: metric.symbol)
+                        .font(.system(size: 17, weight: .semibold))
+                        .tracking(1.2)
+                        .opacity(0.5)
+                        .lineLimit(1)
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(metric.value)
+                            .font(.system(size: 38, weight: .regular))
+                            .monospacedDigit()
+                            .contentTransition(.numericText())
+                        if let unit = metric.unit {
+                            Text(unit)
+                                .font(.system(size: 21, weight: .medium))
+                                .opacity(0.5)
+                        }
+                    }
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("weatherMetric")
+            }
         }
     }
 }

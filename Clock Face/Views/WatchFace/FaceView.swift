@@ -14,6 +14,16 @@ struct FaceView: View {
         case .tint: TintFace(date: date)
         case .daylight: DaylightFace(date: date)
         case .flip: FlipClockFace(date: date)
+        case .circle: CircleFace(date: date)
+        case .bold: BoldFace(date: date)
+        case .minimal: MinimalFace(date: date)
+        case .serifModern: SerifModernFace(date: date)
+        case .dualTime: DualTimeFace(date: date)
+        case .solarArc: SolarArcFace(date: date)
+        case .calendar: CalendarFace(date: date)
+        case .weather: WeatherFace(date: date)
+        case .world: WorldFace(date: date)
+        case .orbit: OrbitFace(date: date)
         }
     }
 }

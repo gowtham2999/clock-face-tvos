@@ -30,7 +30,7 @@ final class ContentProvider: TVTopShelfContentProvider {
 
 /// Mirrors `TopShelfEntry` in the app (Services/TopShelfPublisher.swift).
 struct TopShelfEntry: Decodable {
-    static let appGroupID = "group.gowtham.Clock-Face"
+    static let appGroupID = "group.ai.botagentica.clockface"
     static let indexFileName = "entries.json"
 
     let id: String

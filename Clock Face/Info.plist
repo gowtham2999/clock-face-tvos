@@ -3,12 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Clock Face uses your approximate location to show local weather, sunrise and sunset.</string>
+	<string>Clock Form uses your approximate location to show local weather, sunrise and sunset.</string>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+	</dict>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>gowtham.Clock-Face</string>
+			<string>ai.botagentica.clockface</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>clockface</string>

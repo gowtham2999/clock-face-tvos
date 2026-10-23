@@ -14,6 +14,8 @@ struct RootView: View {
     @State private var detailFace: WatchFaceType?
     @State private var activeReminder: Reminder?
     @State private var hasLaunched = false
+    /// The animated intro plays once per launch, over the first screen.
+    @State private var isShowingSplash = !UserDefaults.standard.bool(forKey: "skipLaunchAnimation")
     /// Set while zooming between the dashboard and the full-screen clock, so the
     /// clock arrives immersive (top bar hidden) and focus lands on the canvas.
     @State private var isZoomingBetweenHomeAndClock = false
@@ -59,6 +61,11 @@ struct RootView: View {
                     .padding(.top, 104)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+
+            if isShowingSplash {
+                LaunchSplashView { isShowingSplash = false }
+                    .zIndex(10)
             }
         }
         .environment(settings)
